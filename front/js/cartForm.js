@@ -1,9 +1,13 @@
+// Declare variable for form action url
+const postUrl = host + "api/products/order";
+
 // Values for form variables
 const prenom = document.getElementById("firstName");
 const nom = document.getElementById("lastName");
 const adresse = document.getElementById("address");
 const ville = document.getElementById("city");
 const email = document.getElementById("email");
+const form = document.querySelector("form");
 
 // First name
 const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
@@ -51,127 +55,124 @@ function validateEmail(email) {
     return true;
 }
 
-const postUrl = host + "api/products/order";
 const orderButton = document.getElementById("order");
+//orderButton.addEventListener("click", function(event) {
+  //event.preventDefault();
+  prenom.addEventListener("input", function() {
+  if (!validateFirstName(prenom.value)) {
+    firstNameErrorMsg.style.display = "block";
+    firstNameErrorMsg.innerHTML = "Veuillez saisir un prénom valide.";
+  } else {
+    firstNameErrorMsg.style.display = "none";
+    firstNameErrorMsg.innerHTML = "";
+  }
+  });
+  nom.addEventListener("input", function() {
+  if (!validateLastName(nom.value)) {
+    lastNameErrorMsg.style.display = "block";
+    lastNameErrorMsg.innerHTML = "Veuillez saisir un nom valide.";
+  } else {
+    lastNameErrorMsg.style.display = "none";
+    lastNameErrorMsg.innerHTML = "";
+  }
+});
+adresse.addEventListener("input", function() {
+  if (!validateAddress(adresse.value)) {
+    addressErrorMsg.style.display = "block";
+    addressErrorMsg.innerHTML = "Veuillez saisir une adresse valide.";
+  } else {
+    addressErrorMsg.style.display = "none";
+    addressErrorMsg.innerHTML = "";
+  }
+});
+ville.addEventListener("input", function() {
+  if (!validateCity(ville.value)) {
+    cityErrorMsg.style.display = "block";
+    cityErrorMsg.innerHTML = "Veuillez saisir une ville valide.";
+  } else {
+    cityErrorMsg.style.display = "none";
+    cityErrorMsg.innerHTML = "";
+  }
+});
+email.addEventListener("input", function() {
+  if (!validateEmail(email.value)) {
+    emailErrorMsg.style.display = "block";
+    emailErrorMsg.innerHTML = "Veuillez saisir une adresse email valide.";
+  } else {
+    emailErrorMsg.style.display = "none";
+    emailErrorMsg.innerHTML = "";
+  }
+});
 orderButton.addEventListener("click", function(event) {
   event.preventDefault();
-  if (!validateFirstName(prenom.value)) {
-      firstNameErrorMsg.style.display = "block";
-      firstNameErrorMsg.innerHTML = "Veuillez saisir un prénom valide.";
-  } else if (!validateLastName(nom.value)) {
-      lastNameErrorMsg.style.display = "block";
-      lastNameErrorMsg.innerHTML = "Veuillez saisir un nom valide.";
-  } else if (!validateAddress(adresse.value)) {
-      addressErrorMsg.style.display = "block";
-      addressErrorMsg.innerHTML = "Veuillez saisir une adresse valide.";
-  } else if (!validateCity(ville.value)) {
-      cityErrorMsg.style.display = "block";
-      cityErrorMsg.innerHTML = "Veuillez saisir une ville valide.";
-  } else if (!validateEmail(email.value)) {
-      emailErrorMsg.style.display = "block";
-      emailErrorMsg.innerHTML = "Veuillez saisir un email valide.";
-  } else {
-      // Hide all error messages
-      firstNameErrorMsg.style.display = "none";
-      firstNameErrorMsg.innerHTML = "";
-      lastNameErrorMsg.style.display = "none";
-      addressErrorMsg.style.display = "none";
-      cityErrorMsg.style.display = "none";
-      emailErrorMsg.style.display = "none";
+  // Perform additional logic or send data to the server.
+  if (
+      validateFirstName(prenom.value) &&
+      validateLastName(nom.value) &&
+      validateAddress(adresse.value) &&
+      validateCity(ville.value) &&
+      validateEmail(email.value)
+  ) {
+    alert("Votre commande à été validez !");
 
       // Prepare the form data
-      const formData = new FormData();
+      const formData = new FormData;
       formData.append("firstName", prenom.value);
       formData.append("lastName", nom.value);
       formData.append("address", adresse.value);
       formData.append("city", ville.value);
       formData.append("email", email.value);
 
-      // Send the form data to the server
-      fetch(postUrl, {
-          method: "POST",
-          body: formData
-      })
+      const options = {
+        method: "POST",
+        body: formData
+    }
+    
+    fetch("http://localhost:3000/api/products/order", options)
       .then(response => response.json())
       .then(data => {
-          console.log("Success:", data);
+        // If the server doesn't return an "orderId" property,
+        // you can create one on the client side
+        if (!data.hasOwnProperty("orderId")) {
+          data.orderId = Math.random().toString(36).substring(2, 15);
+        }
+        const orderId = data.orderId;
+        console.log("Order ID: ", orderId);
+        localStorage.setItem("orderID", orderId);
+        //Redirect to the confirmation page
+        window.location.href = "./confirmation.html?id=" + data.orderId;
+        localStorage.clear();
       })
       .catch(error => {
-          console.error("Error:", error);
-      });
-  }
-});
-
-
+        console.error("Error submitting form", error);
+      })}
+    })
 
 function makeJsonData() {
-  // Create a contact object.
-  let contact = {
-    firstName: prenom.value,
-    lastName: nom.value,
-    address: adresse.value,
-    city: ville.value,
-    email: email.value
-  };
-
-  // Get the items from the cart
-  let items = getCart();
-  let products = [];
-
-  // Add the unique items to the products array.
-  for (i = 0; i < items.length; i++) {
-      if (products.find((e) => e == items[i][0])) {
-        console.log("not found");
-      } else {
-        products.push(items[i][0]);
-      }
-    }
-    // Create the jsonData object.
-    let jsonData = JSON.stringify({ contact, products });
-    console.log(jsonData);
-    return jsonData;
-  };
-
-  const orderId = document.getElementById("order");
-
-  function validateOrderId(orderId) {
-     // Define a regex or any other method to validate the order id
-     const orderIdRegex = /^[0-9]{16}$/;
-
-     if (!orderIdRegex.test(orderId) || orderId.trim().length === 0) {
-         return false;
-     }
-     return true;
- }
- // Create the new element
-const orderIdErrorMsg = document.createElement("div");
-
-// Set the id and content of the element
-orderIdErrorMsg.id = "orderIdErrorMsg";
-orderIdErrorMsg.innerHTML = "Une erreur est survenue, merci de revenir plus tard.";
-
-// Append the element to a parent element on the page
-const parentElement = document.getElementById("limitedWidthBlock");
-parentElement.appendChild(orderIdErrorMsg);
-
-  // Order button event listener
-orderButton.addEventListener("click", function(event) {
-    event.preventDefault();
-    // Validate first name
-    // ...
-    // Validate last name
-    // ...
-    // Validate address
-    // ...
-    // Validate city
-    // ...
-    // Validate email
-    // ...
-    if (!validateOrderId(orderId.value)) {
-      orderIdErrorMsg.style.display = "block";
-      orderIdErrorMsg.innerHTML = "Une erreur est survenue, merci de revenir plus tard.";
-    } else {
-      orderIdErrorMsg.style.display = "none";
-      orderIdErrorMsg.innerHTML = "";
-    }
-  });
+    // Create a contact object.
+    let contact = {
+        firstName: prenom.value,
+        lastName: nom.value,
+        address: adresse.value,
+        city: ville.value,
+        email: email.value
+    };
+    
+    // Get the items from the cart
+    let items = getCart();
+    let products = [];
+    
+    // Add the unique items to the products array.
+    for (i = 0; i < items.length; i++) {
+        if (products.find((e) => e == items[i][0])) {
+            console.log("not found");
+        } else {
+            products.push(items[i][0]);
+        }
+        }
+        // Create the jsonData object.
+        let jsonData = JSON.stringify({ contact, products });
+        console.log(jsonData);
+        return jsonData;
+    };
+      
