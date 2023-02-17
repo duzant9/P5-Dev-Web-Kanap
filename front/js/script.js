@@ -1,11 +1,15 @@
-// Fetching data from backend, displaying kanaps on front page
-let cardsFetch = function () {
-  fetch("http://localhost:3000/api/products/")
+// Declaring server side URLs.
+const host = "http://localhost:3000/";
+const allProductsUrl = host + "api/products/";
+
+// Fetching data from backend, displaying kanaps on home page.
+let allProductsCardsFetch = function () {
+  fetch(allProductsUrl)
     .then((response) => response.json())
     .then((products) => {
       console.log(products);
 
-      let productList = document.getElementById("items");
+      let allProductsCards = document.getElementById("items");
 
       for (i = 0; i < products.length; i++) {
         const productCard = `
@@ -22,8 +26,8 @@ let cardsFetch = function () {
             </article>
           </a>
         `;
-        productList.innerHTML += productCard;
+        allProductsCards.innerHTML += productCard;
       }
     });
   };
-  cardsFetch();
+  allProductsCardsFetch();
