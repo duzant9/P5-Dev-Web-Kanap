@@ -39,20 +39,21 @@ async function fetchProductData() {
         }
         return product;
     }
-
+// Calling the fetch product data function.
 const productData = fetchProductData();
 
-//
+// Retrieve the value of the selected color.
 function colorValue() {
     let color = document.getElementById("colors");
     return color.value;
 }
-//
+// Retrieve the value of the quantity input as a number.
 function quantityValue() {
     let quantity = document.getElementById("quantity");
     return parseInt (quantity.value);
 }
 
+// Add products with spicified id, color and quantity to the cart stored in local storage.
 function addToCart(id, color, quantity) {
     if (quantity <= 0 || color === "") {
         return;
@@ -73,6 +74,7 @@ function addToCart(id, color, quantity) {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
 
+// Iif corlor is selected and quantity is superior to 0, add products to cart.
 const addToCartButton = document.getElementById("addToCart");
 addToCartButton.addEventListener("click", () => {
     const color = colorValue();
@@ -87,6 +89,5 @@ addToCartButton.addEventListener("click", () => {
     } else {
         addToCart(id, color, quantity);
         alert ("Vous venez d'ajoutez des produits à votre panier !")
-        window.location.href = "cart.html";
     }
 });

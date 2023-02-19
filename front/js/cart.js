@@ -38,13 +38,13 @@ function addToCart(id, color, quantity) {
 }
     
 // Change items quantity in car and also local storage.
-function changeQuantity(id, color, newQuantity, event) {
-    event.preventDefault();
+function changeQuantity(id, color, newQuantity) {
     let cart = getCart();
+
     for (let i = 0; i < cart.length; i++) {
       if (id === cart[i][0] && color === cart[i][1]) {
         cart[i][2] = newQuantity;
-    }
+        }
     }
     localStorage.setItem("cart", JSON.stringify(cart));
     fetchAndDisplayProducts();
@@ -58,12 +58,14 @@ function deleteItem(id, color) {
       if (id === cart[i][0] && color === cart[i][1]) {
         cart.splice(i, 1);
         break;
-      }
+        }
     }
     localStorage.setItem("cart", JSON.stringify(cart));
-    fetchAndDisplayProducts();
-  }
+    location.reload();
+    //fetchAndDisplayProducts();
+}
 
+// Fetching products and displaying them on page.
 async function fetchAndDisplayProducts() {
     let cart = getCart();
     let totalPrice = 0;
@@ -76,7 +78,7 @@ async function fetchAndDisplayProducts() {
     let color = cart[i][1];
     let singleProductUrl = productsUrl + id;
 
-    fetch(singleProductUrl)
+    await fetch(singleProductUrl)
         .then((response) => response.json())
         .then((product) => {
         cartItems.innerHTML += 
@@ -102,13 +104,13 @@ async function fetchAndDisplayProducts() {
                 </div>
             </article>`;
 
-        // Calculate and update total price.
+        // Calculate and display total price.
         totalPrice += product.price * cart[i][2];
-        updateTotalPrice(totalPrice);
-        // Calculate and update total quantity.
+        displayTotalPrice(totalPrice);
+        // Calculate and display total quantity.
         totalQuantity += parseInt(cart[i][2]);
-        //updateTotalQuantity(totalQuantity);
-        document.getElementById("totalQuantity").innerHTML = totalQuantity;
+        displayTotalQuantity(totalQuantity);
+    
     })
     }
     } else {
@@ -117,11 +119,12 @@ async function fetchAndDisplayProducts() {
     }
 }
 
-function updateTotalPrice(totalPrice) {
+// Display total price function.
+function displayTotalPrice(totalPrice) {
     document.getElementById("totalPrice").innerHTML = totalPrice;
 }
-  
-function updateTotalQuantity(totalQuantity) {
+  // Displaytotal quantity function.
+function displayTotalQuantity(totalQuantity) {
     document.getElementById("totalQuantity").innerHTML = totalQuantity;
 }
 fetchAndDisplayProducts();
@@ -281,7 +284,7 @@ orderButton.addEventListener("click", async event => {
         return false;
     }
     //return true;
-
+    
     // Perform additional logic or send data to the server.
     if (validateFirstName(prenom.value) &&
     validateLastName(nom.value) &&
@@ -293,4 +296,5 @@ orderButton.addEventListener("click", async event => {
     } else {
       alert("Vérifier les informations de votre formulaire")
     }
+
 });
